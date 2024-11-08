@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogIt</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href = "style.css" rel = "stylesheet">
+    <link rel="icon" href="Images/MR.png" type="image/png">
+    <script src = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+</head>
+<body>
+
+  <!--TOP HEADER-->
+  <header class="p-3 text-bg Header">
+      <div class="container">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+          <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+              <span class = "Money" style = "font-size: 30px; font-weight: bold;">LogIt</span>
+          </a>
+  
+          <ul class="Navigation nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0" style = "margin-left: 30px">
+            <li><a href="#Balance" class="nav-link px-2 text-black">Balance</a></li>
+            <li><a href="#History" class="nav-link px-2 text-black">History</a></li>
+            <li><a href="#" class="nav-link px-2 text-black">Graphs</a></li>
+            <li><a href="#" class="nav-link px-2 text-black">About</a></li>
+          </ul>
+  
+          <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
+            <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+          </form>
+  
+          <div class="text-end">
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-outline-dark me-2" data-bs-toggle="modal" data-bs-target="#balanceModal">
+              Settings
+            </button>
+            <button type="button" class="btn btn-outline-dark me-2" data-bs-toggle="modal" data-bs-target="#currencyModal">
+              Currency
+            </button>
+            <button id = "saveToHistoryButton"type="button" class="btn btn-dark me-2" data-bs-toggle="modal" data-bs-target="#historyModal">
+              Save to History
+            </button>
+          </div>
+        </div>
+      </div>
+  </header>
+
+
+   <!--MAIN ELEMENTS-->
+  <div class = "BalanceMenu" id = "Balance">
+      <div class = "Money"><span id = "MoneyAmount" contenteditable="true">0</span> DA</div>
+      <table class = "DepositWithdraw">
+          <tr>
+              <td><input id = "DepositWithdrawInput" placeholder="+ deposit / - Withdraw" type = "text" class = "form-control form-control-lg" style = "width: 300px"></td>
+              <td><button id = "DepositWithdrawBtn" onclick="DepositWithdraw ()" class="btn btn-dark btn-lg">Submit</button></td>
+          </tr>
+      </table>
+      <div class="btn-group ModeMenu" role="group" aria-label="Basic radio toggle button group">
+          <input onclick = "changeMode()" type="radio" class="btn-check" name="btnradio" id="inhand" autocomplete="off" checked>
+          <label class="btn btn-outline-dark" for="inhand">Inhand</label>
+          <input onclick = "changeMode()" type="radio" class="btn-check" name="btnradio" id="account" autocomplete="off">
+          <label class="btn btn-outline-dark" for="account">Account</label>
+          <input onclick = "changeMode()" type="radio" class="btn-check" name="btnradio" id="total" autocomplete="off">
+          <label class="btn btn-outline-dark" for="total">Total</label>
+      </div>
+  </div>
+
+  <div class = "HistoryChart">
+    <!--HISTORY ELEMENTS-->
+    <div class = "HistoryMenu" id = "History"> 
+      <table class = "HistoryTable">
+        <tr>
+          <td>
+            <table class="table table-dark table-border table-bordered  table-striped-columns table-hover MainHistoryTable">
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Inhand</th>
+                  <th scope="col">Account</th>
+                  <th scope="col">Total</th>
+                  <th scope="col">Change</th>
+                  <th scope = "col">Reason</th>
+                  <th scope="col">Debt</th>
+                  <th scope = "col">Debtor</th>
+                </tr>
+              </thead>
+              <tbody class = "HistoryTableBody">
+      
+              </tbody>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <table style = "margin-left: 50px">
+            <tr>
+              <td>
+              <button type="button" class="btn btn-dark me-2" onclick = "loadPreviousHistory()">
+                Previous
+              </button>
+              </td>
+              <td>
+                <button type="button" class="btn btn-dark me-2" onclick = "loadNextHistory()">
+                  Next
+                </button>
+              </td>
+            </tr>
+          </table>
+        </tr>
+      </table>
+    </div>
+    <!--CHART-->
+    <div class="ChartContainer">
+      <canvas id = "myChart"></canvas>
+    </div>
+  </div>
+
+  <!--MODALS-->
+
+  <!--Settings / Balance MNGMT Modal-->
+  <div class="modal fade" id="balanceModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Settings</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>History Segment:</p>
+          <button onclick = "deleteAllSaves()" id = "DeleteSaves" class="btn btn-dark">Delete History Row</button>
+          <hr>
+          <p>Users:</p>
+          <select class="form-select" id = "userSelect" aria-label="Large select example">
+            <option selected>Select User</option>
+          </select>
+          <span id = "userBalance"></span>
+          <hr>
+          <p>Saved Data Management:</p>
+          <button onclick = "deleteAllSaves()" id = "DeleteSaves" class="btn btn-danger">Delete All Saves</button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button onclick = "newUser()" id = "load"class="btn btn-dark">New User</button>
+          <button onclick = "save()" id = "save" class="btn btn-dark">Save</button>
+          <button onclick = "load()" id = "load"class="btn btn-dark">Load</button>
+          <button onclick = "deleteBal()" id = "delete"class="btn btn-dark">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--Currency Modal-->
+  <div class="modal fade" id="currencyModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Balance Management</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <table>
+            <select>
+              <option>Algeria: DZD</option>
+              <option>USA: Dollars</option>
+              <option>Europe: Euro</option>
+              <option>Japan: Yen</option>
+            </select>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button onclick = "changeCurrency()" id = "save" class="btn btn-dark" data-bs-dismiss="modal">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--Save to History modal-->
+  <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">History Details</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>(!) If you want to add additional details fill the answers below or skip them</p>
+          <p>What's the reason for today's change?</p>
+          <input type = "text" id = "reasonVal" name = "inputField" class = "form-control">
+          <p>Is anyone in-debt to you?</p>
+          <input type="text" id="debtorVal" name="inputField" class="form-control">
+          <p>How much debt?</p>
+          <input type="text" id="debtVal" name="inputField" class="form-control">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button onclick = "newHistory()" id = "submitHistory" class="btn btn-dark" data-bs-dismiss="modal">Submit</button>
+        </div>
+      </div>
+  </div>
+
+  <script src = "index.js"></script>
+  <script src = "transaction.js"></script>
+  <script src = "balance.js"></script>
+  <script src = "chart.js"></script>
+  <script src = "history.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
