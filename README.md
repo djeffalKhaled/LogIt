@@ -11,3 +11,6 @@ Web-app for logging your personal income and expenses as well as viewing its day
   <li>Graph representation of your total income's daily change</li>
   <li>Automatic save and load of your balance</li>
 </ol>
+
+## Libraries:
+- Bootstrap
